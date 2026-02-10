@@ -6,6 +6,11 @@
 
 Reduce manual email analysis from **10 minutes to 10 seconds** while maintaining SOC-level accuracy.
 
+**Try it out**: [PhishGuard Live](https://phisguard.streamlit.app/) 
+<br>
+<br>
+![Interface](screenshot.png)
+
 ## 🔍 What PhishGuard Analyzes
 
 | Analysis Module | Description |
