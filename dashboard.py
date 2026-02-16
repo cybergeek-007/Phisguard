@@ -86,7 +86,7 @@ st.markdown("""
     }
     
     .metric-card {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: linear-gradient(135deg, #f8fafc 0%, #000000 100%);
         border-radius: 16px;
         padding: 24px;
         text-align: center;
@@ -189,7 +189,7 @@ st.markdown("""
     }
     
     .feature-card {
-        background: white;
+        background: #919191;
         border-radius: 12px;
         padding: 20px;
         border: 1px solid #e5e7eb;
@@ -297,7 +297,7 @@ st.markdown("""
     }
     
     .sidebar-section {
-        background: #f8fafc;
+        background: black;
         border-radius: 12px;
         padding: 16px;
         margin-bottom: 16px;
@@ -310,7 +310,7 @@ st.markdown("""
     }
     
     .history-item {
-        background: white;
+        background: black;
         border-radius: 8px;
         padding: 10px 12px;
         margin-bottom: 8px;
