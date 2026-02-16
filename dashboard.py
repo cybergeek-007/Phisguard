@@ -2,6 +2,7 @@
 PhishGuard Streamlit Dashboard
 ==============================
 Interactive web interface for email security analysis.
+Enhanced with modern UI and improved UX.
 """
 
 import streamlit as st
@@ -26,58 +27,367 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# Enhanced Custom CSS with modern styling and dark mode support
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+    
     .main-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1f77b4;
+        font-size: 2.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
     }
+    
+    .subheader {
+        font-size: 1.1rem;
+        color: #6b7280;
+        font-weight: 400;
+    }
+    
+    /* Dark mode support for subheader */
+    [data-theme="dark"] .subheader {
+        color: #9ca3af;
+    }
+    
     .threat-high {
-        color: #ff4b4b;
-        font-weight: bold;
+        color: #dc2626;
+        font-weight: 700;
     }
+    
     .threat-medium {
-        color: #ffa500;
-        font-weight: bold;
+        color: #ea580c;
+        font-weight: 700;
     }
+    
     .threat-low {
-        color: #2ecc71;
-        font-weight: bold;
+        color: #16a34a;
+        font-weight: 700;
     }
+    
+    /* Dark mode threat colors - brighter for visibility */
+    [data-theme="dark"] .threat-high {
+        color: #ef4444;
+    }
+    
+    [data-theme="dark"] .threat-medium {
+        color: #f97316;
+    }
+    
+    [data-theme="dark"] .threat-low {
+        color: #22c55e;
+    }
+    
     .metric-card {
-        background-color: rgba(240, 242, 246, 0.1);
-        border: 1px solid rgba(49, 51, 63, 0.2);
-        border-radius: 10px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    /* Dark mode metric card */
+    [data-theme="dark"] .metric-card {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        border: 1px solid #374151;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    [data-theme="dark"] .metric-card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+    
+    .indicator-found {
+        color: #dc2626;
+    }
+    
+    .indicator-clear {
+        color: #16a34a;
+    }
+    
+    [data-theme="dark"] .indicator-found {
+        color: #ef4444;
+    }
+    
+    [data-theme="dark"] .indicator-clear {
+        color: #22c55e;
+    }
+    
+    .stButton>button {
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton>button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .score-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 auto;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .score-high {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #dc2626;
+        border: 4px solid #dc2626;
+    }
+    
+    .score-medium {
+        background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+        color: #ea580c;
+        border: 4px solid #ea580c;
+    }
+    
+    .score-low {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: #16a34a;
+        border: 4px solid #16a34a;
+    }
+    
+    /* Dark mode score circles */
+    [data-theme="dark"] .score-high {
+        background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+        color: #fca5a5;
+        border: 4px solid #ef4444;
+    }
+    
+    [data-theme="dark"] .score-medium {
+        background: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%);
+        color: #fdba74;
+        border: 4px solid #f97316;
+    }
+    
+    [data-theme="dark"] .score-low {
+        background: linear-gradient(135deg, #14532d 0%, #166534 100%);
+        color: #86efac;
+        border: 4px solid #22c55e;
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 12px;
         padding: 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    /* Dark mode feature card */
+    [data-theme="dark"] .feature-card {
+        background: #1f2937;
+        border: 1px solid #374151;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    
+    .feature-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #667eea;
+    }
+    
+    [data-theme="dark"] .feature-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        border-color: #818cf8;
+    }
+    
+    .auth-pass {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: #166534;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-weight: 600;
         text-align: center;
     }
-    .indicator-found {
-        color: #ff4b4b;
-    }
-    .indicator-clear {
-        color: #2ecc71;
+    
+    .auth-fail {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-align: center;
     }
     
-    /* Dark mode specific styles */
-    @media (prefers-color-scheme: dark) {
-        .metric-card {
-            background-color: rgba(38, 39, 48, 0.4);
-            border: 1px solid rgba(250, 250, 250, 0.1);
-        }
+    .auth-neutral {
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        color: #4b5563;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-align: center;
     }
     
-    /* Streamlit dark theme detection */
-    [data-theme="dark"] .metric-card {
-        background-color: rgba(38, 39, 48, 0.4);
-        border: 1px solid rgba(250, 250, 250, 0.1);
+    /* Dark mode auth badges */
+    [data-theme="dark"] .auth-pass {
+        background: linear-gradient(135deg, #14532d 0%, #166534 100%);
+        color: #86efac;
     }
     
-    /* Streamlit light theme detection */
-    [data-theme="light"] .metric-card {
-        background-color: rgba(240, 242, 246, 0.8);
-        border: 1px solid rgba(49, 51, 63, 0.1);
+    [data-theme="dark"] .auth-fail {
+        background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+        color: #fca5a5;
+    }
+    
+    [data-theme="dark"] .auth-neutral {
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        color: #d1d5db;
+    }
+    
+    .threat-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-high {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .badge-medium {
+        background: #ffedd5;
+        color: #ea580c;
+    }
+    
+    .badge-low {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+    
+    /* Dark mode badges */
+    [data-theme="dark"] .badge-high {
+        background: #7f1d1d;
+        color: #fca5a5;
+    }
+    
+    [data-theme="dark"] .badge-medium {
+        background: #7c2d12;
+        color: #fdba74;
+    }
+    
+    [data-theme="dark"] .badge-low {
+        background: #14532d;
+        color: #86efac;
+    }
+    
+    .sidebar-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    
+    /* Dark mode sidebar section */
+    [data-theme="dark"] .sidebar-section {
+        background: #1f2937;
+        border: 1px solid #374151;
+    }
+    
+    .history-item {
+        background: white;
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        border-left: 4px solid #e5e7eb;
+        font-size: 0.9rem;
+    }
+    
+    /* Dark mode history item */
+    [data-theme="dark"] .history-item {
+        background: #111827;
+        border-left: 4px solid #374151;
+    }
+    
+    .history-high {
+        border-left-color: #dc2626;
+    }
+    
+    .history-medium {
+        border-left-color: #ea580c;
+    }
+    
+    .history-low {
+        border-left-color: #16a34a;
+    }
+    
+    [data-theme="dark"] .history-high {
+        border-left-color: #ef4444;
+    }
+    
+    [data-theme="dark"] .history-medium {
+        border-left-color: #f97316;
+    }
+    
+    [data-theme="dark"] .history-low {
+        border-left-color: #22c55e;
+    }
+    
+    .welcome-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .welcome-hero h1 {
+        color: white;
+        margin-bottom: 10px;
+    }
+    
+    .welcome-hero p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.1rem;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    .stProgress > div > div {
+        border-radius: 10px;
+    }
+    
+    .stDataFrame {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    /* Additional dark mode text color fixes */
+    [data-theme="dark"] .metric-card h4,
+    [data-theme="dark"] .feature-card h4,
+    [data-theme="dark"] .feature-card p {
+        color: #e5e7eb;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -114,44 +424,67 @@ def get_threat_class(score):
     return "threat-low"
 
 
+def get_score_circle_class(score):
+    """Get score circle CSS class"""
+    if score >= 71:
+        return "score-high"
+    elif score >= 31:
+        return "score-medium"
+    return "score-low"
+
+
+def get_badge_class(score):
+    """Get badge CSS class"""
+    if score >= 71:
+        return "badge-high"
+    elif score >= 31:
+        return "badge-medium"
+    return "badge-low"
+
+
 def render_header():
     """Render the main header"""
-    col1, col2 = st.columns([3, 1])
+    col1, col2 = st.columns([4, 1])
     
     with col1:
         st.markdown('<p class="main-header">🛡️ PhishGuard</p>', unsafe_allow_html=True)
-        st.markdown("**Email Header Forensics & Threat Analysis Platform**")
+        st.markdown('<p class="subheader">Advanced Email Security & Phishing Detection Platform</p>', unsafe_allow_html=True)
     
     with col2:
         if DEMO_MODE:
-            st.warning("⚠️ DEMO MODE\nUsing simulated threat data", icon="⚠️")
+            st.warning("⚠️ DEMO MODE", icon="⚠️")
+            st.caption("Using simulated threat data")
         else:
             st.success("✅ API Connected", icon="✅")
+            st.caption("Live threat intelligence")
 
 
 def render_sidebar():
     """Render the sidebar with input options"""
+    st.sidebar.markdown("<div class='sidebar-section'>", unsafe_allow_html=True)
     st.sidebar.header("📧 Email Input")
     
     input_method = st.sidebar.radio(
         "Choose Input Method:",
-        ["Upload .eml File", "Paste Email Headers", "Sample Analysis"]
+        ["📁 Upload .eml File", "📋 Paste Email Headers", "🎯 Sample Analysis"],
+        label_visibility="collapsed"
     )
     
     email_data = None
     
-    if input_method == "Upload .eml File":
+    if input_method == "📁 Upload .eml File":
         uploaded_file = st.sidebar.file_uploader(
             "Upload .eml file",
             type=['eml'],
-            help="Upload an email file exported from your email client"
+            help="Upload an email file exported from your email client",
+            label_visibility="collapsed"
         )
         
         if uploaded_file:
             email_data = uploaded_file.read()
             st.sidebar.success(f"✅ Loaded: {uploaded_file.name}")
     
-    elif input_method == "Paste Email Headers":
+    elif input_method == "📋 Paste Email Headers":
         st.sidebar.info("Paste raw email headers including Received, From, To, etc.")
         pasted_headers = st.sidebar.text_area(
             "Email Headers:",
@@ -169,13 +502,16 @@ To: recipient@example.com
     
     else:  # Sample Analysis
         st.sidebar.info("Analyze a sample phishing email for demonstration")
-        if st.sidebar.button("Load Sample"):
-            # Create a sample phishing email
+        if st.sidebar.button("🎯 Load Sample Phishing Email", use_container_width=True):
             email_data = create_sample_email()
+            st.sidebar.success("✅ Sample loaded!")
+    
+    st.sidebar.markdown("</div>", unsafe_allow_html=True)
     
     # Analyze button
+    st.sidebar.markdown("<div class='sidebar-section'>", unsafe_allow_html=True)
     if email_data and st.sidebar.button("🚀 Analyze Email", type="primary", use_container_width=True):
-        with st.spinner("Analyzing email..."):
+        with st.spinner("🔍 Analyzing email security..."):
             result = st.session_state.analyzer.analyze_eml_bytes(email_data)
             if result:
                 st.session_state.analysis_result = result
@@ -190,17 +526,26 @@ To: recipient@example.com
                 st.sidebar.error("❌ Failed to parse email")
     
     # Clear button
-    if st.session_state.analysis_result and st.sidebar.button("🗑️ Clear Results"):
+    if st.session_state.analysis_result and st.sidebar.button("🗑️ Clear Results", use_container_width=True):
         st.session_state.analysis_result = None
         st.rerun()
+    st.sidebar.markdown("</div>", unsafe_allow_html=True)
     
     # History
     if st.session_state.analysis_history:
         st.sidebar.markdown("---")
         st.sidebar.subheader("📊 Analysis History")
         for item in st.session_state.analysis_history[-5:]:
-            color = "🔴" if item['score'] >= 71 else "🟠" if item['score'] >= 31 else "🟢"
-            st.sidebar.text(f"{item['timestamp']} - {color} {item['score']}")
+            score = item['score']
+            history_class = "history-high" if score >= 71 else "history-medium" if score >= 31 else "history-low"
+            st.sidebar.markdown(
+                f"<div class='history-item {history_class}'>"
+                f"<small>{item['timestamp']}</small><br>"
+                f"<strong>{item['subject']}</strong><br>"
+                f"Score: <b>{score}</b> - {item['classification'][:10]}"
+                f"</div>",
+                unsafe_allow_html=True
+            )
 
 
 def create_sample_email() -> bytes:
@@ -240,45 +585,54 @@ Actual link: http://paypa1-verify.com/login</p>
 
 
 def render_threat_score(result):
-    """Render the threat score section"""
+    """Render the threat score section with enhanced visuals"""
     score = result.get('threat_score', 0)
     classification = result.get('classification', 'UNKNOWN')
     
     st.subheader("🎯 Threat Assessment")
     
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns([1.5, 1, 1, 1])
     
     with col1:
-        color = get_threat_color(score)
-        st.metric(
-            label="Threat Score",
-            value=f"{color} {score}/100"
-        )
+        # Score circle
+        circle_class = get_score_circle_class(score)
+        st.markdown(f"""
+        <div class="score-circle {circle_class}">
+            {score}
+        </div>
+        <p style="text-align: center; margin-top: 10px; font-weight: 600;">Threat Score</p>
+        """, unsafe_allow_html=True)
     
     with col2:
         threat_class = get_threat_class(score)
+        badge_class = get_badge_class(score)
         st.markdown(f"""
         <div class="metric-card">
             <h4>Classification</h4>
-            <p class="{threat_class}">{classification}</p>
+            <span class="threat-badge {badge_class}">{classification.replace('_', ' ')}</span>
         </div>
         """, unsafe_allow_html=True)
     
     with col3:
         recommendation = "BLOCK" if score >= 71 else "REVIEW" if score >= 31 else "ACCEPT"
         rec_color = "🔴" if recommendation == "BLOCK" else "🟠" if recommendation == "REVIEW" else "🟢"
-        st.metric(
-            label="Recommendation",
-            value=f"{rec_color} {recommendation}"
-        )
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4>Recommendation</h4>
+            <p style="font-size: 1.2rem; font-weight: 700;">{rec_color} {recommendation}</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col4:
-        st.metric(
-            label="Analysis Time",
-            value=f"{result.get('analysis_time_seconds', 0)}s"
-        )
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4>Analysis Time</h4>
+            <p style="font-size: 1.2rem; font-weight: 700;">⚡ {result.get('analysis_time_seconds', 0)}s</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # Progress bar
+    # Progress bar with color coding
+    progress_color = "red" if score >= 71 else "orange" if score >= 31 else "green"
     st.progress(score / 100, text=f"Risk Level: {score}%")
 
 
@@ -289,14 +643,17 @@ def render_email_metadata(result):
     col1, col2 = st.columns(2)
     
     with col1:
-        metadata = {
-            "Message ID": result.get('message_id', 'N/A')[:50] + '...' if len(result.get('message_id', '')) > 50 else result.get('message_id', 'N/A'),
-            "From (Display)": result.get('from_header', 'N/A'),
-            "To": result.get('to', 'N/A')[:50] + '...' if len(result.get('to', '')) > 50 else result.get('to', 'N/A'),
-        }
-        
-        for key, value in metadata.items():
-            st.text(f"**{key}:** {value}")
+        with st.container():
+            st.markdown("**Message ID:**")
+            msg_id = result.get('message_id', 'N/A')
+            st.code(msg_id[:60] + '...' if len(msg_id) > 60 else msg_id, language=None)
+            
+            st.markdown("**From (Display):**")
+            st.info(result.get('from_header', 'N/A'))
+            
+            st.markdown("**To:**")
+            to_addr = result.get('to', 'N/A')
+            st.info(to_addr[:50] + '...' if len(to_addr) > 50 else to_addr)
     
     with col2:
         envelope = result.get('from_envelope', '')
@@ -304,16 +661,21 @@ def render_email_metadata(result):
         
         # Check for mismatch
         if envelope and header and envelope not in header:
-            st.error(f"**From (Envelope):** {envelope} ⚠️ MISMATCH DETECTED")
+            st.markdown("**From (Envelope):**")
+            st.error(f"{envelope} ⚠️ MISMATCH DETECTED")
         else:
-            st.text(f"**From (Envelope):** {envelope or 'N/A'}")
+            st.markdown("**From (Envelope):**")
+            st.info(envelope or 'N/A')
         
-        st.text(f"**Subject:** {result.get('subject', 'N/A')}")
-        st.text(f"**Timestamp:** {result.get('timestamp', 'N/A')}")
+        st.markdown("**Subject:**")
+        st.info(result.get('subject', 'N/A'))
+        
+        st.markdown("**Timestamp:**")
+        st.info(result.get('timestamp', 'N/A'))
 
 
 def render_authentication_results(result):
-    """Render authentication results section"""
+    """Render authentication results section with enhanced visuals"""
     st.subheader("🔐 Authentication Status")
     
     auth = result.get('authentication', {})
@@ -324,11 +686,11 @@ def render_authentication_results(result):
         spf = auth.get('spf', {})
         spf_result = spf.get('result', 'none')
         if spf_result == 'pass':
-            st.success(f"**SPF:** ✅ PASS")
+            st.markdown('<div class="auth-pass">✅ SPF PASS</div>', unsafe_allow_html=True)
         elif spf_result in ['fail', 'softfail']:
-            st.error(f"**SPF:** ❌ {spf_result.upper()}")
+            st.markdown(f'<div class="auth-fail">❌ SPF {spf_result.upper()}</div>', unsafe_allow_html=True)
         else:
-            st.info(f"**SPF:** ⚪ {spf_result.upper()}")
+            st.markdown(f'<div class="auth-neutral">⚪ SPF {spf_result.upper()}</div>', unsafe_allow_html=True)
         
         if spf.get('reason'):
             st.caption(spf.get('reason'))
@@ -337,11 +699,11 @@ def render_authentication_results(result):
         dkim = auth.get('dkim', {})
         dkim_result = dkim.get('result', 'none')
         if dkim_result == 'pass':
-            st.success(f"**DKIM:** ✅ PASS")
+            st.markdown('<div class="auth-pass">✅ DKIM PASS</div>', unsafe_allow_html=True)
         elif dkim_result == 'fail':
-            st.error(f"**DKIM:** ❌ FAIL")
+            st.markdown('<div class="auth-fail">❌ DKIM FAIL</div>', unsafe_allow_html=True)
         else:
-            st.info(f"**DKIM:** ⚪ {dkim_result.upper()}")
+            st.markdown(f'<div class="auth-neutral">⚪ DKIM {dkim_result.upper()}</div>', unsafe_allow_html=True)
         
         if dkim.get('selector'):
             st.caption(f"Selector: {dkim.get('selector')}")
@@ -350,11 +712,11 @@ def render_authentication_results(result):
         dmarc = auth.get('dmarc', {})
         dmarc_result = dmarc.get('policy', 'none')
         if dmarc_result in ['reject', 'quarantine']:
-            st.success(f"**DMARC:** ✅ {dmarc_result.upper()}")
+            st.markdown(f'<div class="auth-pass">✅ DMARC {dmarc_result.upper()}</div>', unsafe_allow_html=True)
         elif dmarc_result == 'none':
-            st.info(f"**DMARC:** ⚪ NONE")
+            st.markdown('<div class="auth-neutral">⚪ DMARC NONE</div>', unsafe_allow_html=True)
         else:
-            st.error(f"**DMARC:** ❌ {dmarc_result.upper()}")
+            st.markdown(f'<div class="auth-fail">❌ DMARC {dmarc_result.upper()}</div>', unsafe_allow_html=True)
         
         if dmarc.get('percentage'):
             st.caption(f"Pct: {dmarc.get('percentage')}%")
@@ -373,7 +735,7 @@ def render_relay_path(result):
     # Summary
     st.caption(result.get('relay_summary', ''))
     
-    # Create DataFrame
+    # Create DataFrame with enhanced styling
     df_data = []
     for hop in relay_path:
         df_data.append({
@@ -409,7 +771,7 @@ def get_country_flag(country_code):
 
 
 def render_threat_indicators(result):
-    """Render threat indicators section"""
+    """Render threat indicators section with enhanced visuals"""
     st.subheader("🚨 Threat Indicators")
     
     indicators = result.get('threat_indicators', {})
@@ -420,52 +782,52 @@ def render_threat_indicators(result):
         # Lookalike domain
         lookalike = indicators.get('lookalike_domain', {})
         if lookalike.get('is_lookalike'):
-            st.error(f"✅ **Lookalike Domain Detected**\n\n{lookalike.get('example', '')}")
+            st.error(f"🚨 **Lookalike Domain Detected**\n\n{lookalike.get('example', '')}")
         elif lookalike.get('suspicious_tld'):
             st.warning(f"⚠️ **Suspicious TLD:** {lookalike.get('tld', '')}")
         else:
-            st.success("❌ No lookalike domain detected")
+            st.success("✅ No lookalike domain detected")
         
         # Sender mismatch
         sender_mismatch = indicators.get('sender_mismatch', {})
         if sender_mismatch.get('mismatch'):
-            st.error(f"✅ **Sender Mismatch**\n\nHeader: {sender_mismatch.get('header_domain')}\nEnvelope: {sender_mismatch.get('envelope_domain')}")
+            st.error(f"🚨 **Sender Mismatch**\n\nHeader: {sender_mismatch.get('header_domain')}\nEnvelope: {sender_mismatch.get('envelope_domain')}")
         else:
-            st.success("❌ No sender mismatch")
+            st.success("✅ No sender mismatch")
         
         # Urgency keywords
         urgency = indicators.get('urgency_keywords', [])
         if urgency:
-            st.error(f"✅ **Urgency Keywords ({len(urgency)})**\n\n{', '.join(urgency[:5])}")
+            st.error(f"🚨 **Urgency Keywords ({len(urgency)})**\n\n{', '.join(urgency[:5])}")
         else:
-            st.success("❌ No urgency keywords")
+            st.success("✅ No urgency keywords")
     
     with col2:
         # Link mismatches
         link_mismatches = indicators.get('link_mismatches', [])
         if link_mismatches:
-            st.error(f"✅ **Link Mismatches ({len(link_mismatches)})**")
+            st.error(f"🚨 **Link Mismatches ({len(link_mismatches)})**")
             for mismatch in link_mismatches[:3]:
                 st.text(f"• {mismatch.get('visible_text', 'N/A')[:30]} → {mismatch.get('actual_domain', 'N/A')}")
         else:
-            st.success("❌ No link mismatches")
+            st.success("✅ No link mismatches")
         
         # Suspicious URLs
         suspicious_urls = indicators.get('suspicious_urls', [])
         if suspicious_urls:
-            st.error(f"✅ **Suspicious URLs ({len(suspicious_urls)})**")
+            st.error(f"🚨 **Suspicious URLs ({len(suspicious_urls)})**")
             for url_info in suspicious_urls[:3]:
                 st.text(f"• {url_info.get('domain', 'N/A')}")
                 st.caption(f"  Reasons: {', '.join(url_info.get('reasons', [])[:2])}")
         else:
-            st.success("❌ No suspicious URLs")
+            st.success("✅ No suspicious URLs")
         
         # Domain age
         domain_info = result.get('domain_info', {})
         if domain_info.get('is_new'):
-            st.error(f"✅ **New Domain** ({domain_info.get('age_days', 0)} days old)")
+            st.error(f"🚨 **New Domain** ({domain_info.get('age_days', 0)} days old)")
         else:
-            st.success(f"❌ Domain age OK ({domain_info.get('age_days', 'Unknown')} days)")
+            st.success(f"✅ Domain age OK ({domain_info.get('age_days', 'Unknown')} days)")
 
 
 def render_scoring_breakdown(result):
@@ -475,13 +837,15 @@ def render_scoring_breakdown(result):
     reasons = result.get('scoring_reasons', [])
     
     if reasons:
-        for reason in reasons:
+        cols = st.columns(2)
+        for i, reason in enumerate(reasons):
+            col = cols[i % 2]
             if '+' in reason:
-                st.text(f"🔴 {reason}")
+                col.markdown(f"🔴 {reason}")
             elif 'discount' in reason.lower():
-                st.text(f"🟢 {reason}")
+                col.markdown(f"🟢 {reason}")
             else:
-                st.text(f"⚪ {reason}")
+                col.markdown(f"⚪ {reason}")
     else:
         st.info("No scoring details available")
 
@@ -513,6 +877,86 @@ def render_export_options(result):
             mime="text/plain",
             use_container_width=True
         )
+
+
+def render_welcome_screen():
+    """Render enhanced welcome screen"""
+    st.markdown("""
+    <div class="welcome-hero">
+        <h1>🛡️ Welcome to PhishGuard</h1>
+        <p>Advanced Email Security & Phishing Detection Platform</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        ### 🔍 **What We Analyze**
+        
+        <div class="feature-card">
+            <h4>🔐 Authentication</h4>
+            <p>SPF, DKIM, and DMARC validation to verify email authenticity</p>
+        </div>
+        
+        <div class="feature-card">
+            <h4>🌍 Relay Path</h4>
+            <p>Trace email's journey through mail servers with geolocation</p>
+        </div>
+        
+        <div class="feature-card">
+            <h4>🧠 Threat Intelligence</h4>
+            <p>IP reputation, domain age, and URL analysis</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        ### 🚨 **Phishing Detection**
+        
+        <div class="feature-card">
+            <h4>👤 Lookalike Domains</h4>
+            <p>Detect domain spoofing using Levenshtein distance</p>
+        </div>
+        
+        <div class="feature-card">
+            <h4>⏰ Urgency Keywords</h4>
+            <p>Identify pressure tactics commonly used in phishing</p>
+        </div>
+        
+        <div class="feature-card">
+            <h4>🔗 Link Analysis</h4>
+            <p>Find mismatched and suspicious URLs</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    ### 🚀 **Get Started**
+    
+    1. **Upload an .eml file** from your email client, or
+    2. **Paste email headers** directly, or
+    3. **Try the sample** to see how it works
+    
+    Use the sidebar on the left to begin! 👈
+    """)
+    
+    # Stats
+    if st.session_state.analysis_history:
+        st.divider()
+        st.subheader("📈 Session Statistics")
+        
+        stats = st.session_state.analyzer.get_statistics()
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total Analyzed", stats['total_analyzed'])
+        with col2:
+            st.metric("High Risk", stats['high_risk'], delta_color="inverse")
+        with col3:
+            st.metric("Medium Risk", stats['medium_risk'])
+        with col4:
+            st.metric("Avg Time", f"{stats['avg_time']}s")
 
 
 def main():
@@ -558,50 +1002,7 @@ def main():
         render_export_options(result)
     
     else:
-        # Welcome screen
-        st.markdown("""
-        ## Welcome to PhishGuard! 🛡️
-        
-        PhishGuard is an advanced email security analysis platform that helps you:
-        
-        ### 🔍 **What We Analyze**
-        
-        | Feature | Description |
-        |---------|-------------|
-        | **SPF Validation** | Verify if the sending IP is authorized |
-        | **DKIM Verification** | Check cryptographic email signatures |
-        | **DMARC Policy** | Validate domain authentication policies |
-        | **Relay Path** | Trace email's journey through mail servers |
-        | **IP Reputation** | Check against threat intelligence databases |
-        | **Phishing Heuristics** | Detect lookalike domains, urgency keywords |
-        | **Link Analysis** | Identify mismatched and suspicious URLs |
-        
-        ### 🚀 **Get Started**
-        
-        1. **Upload an .eml file** from your email client, or
-        2. **Paste email headers** directly, or
-        3. **Try the sample** to see how it works
-        
-        Use the sidebar on the left to begin! 👈
-        """)
-        
-        # Stats
-        if st.session_state.analysis_history:
-            st.divider()
-            st.subheader("📈 Session Statistics")
-            
-            stats = st.session_state.analyzer.get_statistics()
-            
-            col1, col2, col3, col4 = st.columns(4)
-            
-            with col1:
-                st.metric("Total Analyzed", stats['total_analyzed'])
-            with col2:
-                st.metric("High Risk", stats['high_risk'], delta_color="inverse")
-            with col3:
-                st.metric("Medium Risk", stats['medium_risk'])
-            with col4:
-                st.metric("Avg Time", f"{stats['avg_time']}s")
+        render_welcome_screen()
 
 
 if __name__ == "__main__":
