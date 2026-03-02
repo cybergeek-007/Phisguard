@@ -1,231 +1,275 @@
-# PhishGuard — Email Security Analysis Platform
+```
+        ██████╗ ██╗  ██╗██╗███████╗██╗  ██╗ ██████╗ ██╗   ██╗ █████╗ ██████╗ ██████╗
+        ██╔══██╗██║  ██║██║██╔════╝██║  ██║██╔════╝ ██║   ██║██╔══██╗██╔══██╗██╔══██╗
+        ██████╔╝███████║██║███████╗███████║██║  ███╗██║   ██║███████║██████╔╝██║  ██║
+        ██╔═══╝ ██╔══██║██║╚════██║██╔══██║██║   ██║██║   ██║██╔══██║██╔══██╗██║  ██║
+        ██║     ██║  ██║██║███████║██║  ██║╚██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝
+        ╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝
+```
 
-🛡️ **PhishGuard** is a production-ready email security analysis platform that automates the forensic investigation process typically performed manually by SOC analysts.
+<p align="center">
+  <b>Automated Email Forensics & Phishing Detection Engine</b><br>
+  <i>What takes a SOC analyst 10 minutes — PhishGuard does in 10 seconds.</i>
+</p>
 
-## 🎯 Mission
+<p align="center">
+  <a href="https://phisshguard.streamlit.app"><img src="https://img.shields.io/badge/LIVE%20DEMO-00ff?style=for-the-badge&logo=streamlit&logoColor=black" alt="Live Demo"></a>
+  <img src="https://img.shields.io/badge/python-3.8+-00ff?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/license-MIT-00ff?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/APIs-4%20integrated-00ff?style=for-the-badge" alt="APIs">
+</p>
 
-Reduce manual email analysis from **10 minutes to 10 seconds** while maintaining SOC-level accuracy.
+---
 
-**Try it out**: [PhishGuard](https://phisshguard.streamlit.app)
+## `> whoami`
 
-## 🔍 What PhishGuard Analyzes
+PhishGuard is an **offensive-grade email forensics platform** built for security professionals, SOC analysts, and anyone who's tired of manually dissecting suspicious emails.
 
-| Analysis Module | Description | Source |
-|----------------|-------------|--------|
-| **SPF** | Verify sender IP authorization | `Authentication-Results` header or DNS TXT lookup |
-| **DKIM** | Check cryptographic email signatures | `Authentication-Results` header or DNS key check |
-| **DMARC** | Validate domain authentication policy | `Authentication-Results` header or `_dmarc.` DNS lookup |
-| **IP Reputation** | Abuse confidence score for sending server IPs | **AbuseIPDB API** (live) or offline |
-| **URL Blocklist** | Check URLs against Google's global blocklist | **Google Safe Browsing API** (live) or offline |
-| **URL Malware Scan** | Multi-engine URL scanning (60+ AV engines) | **VirusTotal API** (live) or offline |
-| **IP Geolocation** | Map relay hops to countries / ISPs | **ip-api.com** (free, no key needed) |
-| **Domain Age** | Identify newly registered domains | **WHOIS** (free, no key needed) |
-| **Lookalike Domains** | DNS-verified brand similarity detection | Levenshtein + MX/A DNS lookups (offline) |
-| **URL Analysis** | Detect suspicious / shortened / IP-based links | Pattern analysis (offline) |
-| **Link Mismatches** | Visible text ≠ actual href | HTML parsing (offline) |
-| **Urgency Keywords** | Social engineering pressure tactics | Regex pattern matching (offline) |
+Drop a `.eml` file. Paste raw headers. Get a full forensic breakdown — authentication, relay tracing, threat intelligence, lookalike detection — in seconds. No fluff. No false sense of security. Just data.
 
-## 🚀 Quick Start
+---
 
-### Prerequisites
+## `> cat /etc/threat_matrix`
 
-- Python 3.8+
-- pip
+```
+┌────────────────────────┬──────────────────────────────────────────┬─────────────────────────────────┐
+│ MODULE                 │ DESCRIPTION                              │ SOURCE                          │
+├────────────────────────┼──────────────────────────────────────────┼─────────────────────────────────┤
+│ SPF Validation         │ Sender IP authorization check            │ Auth-Results header / DNS TXT   │
+│ DKIM Verification      │ Cryptographic signature validation       │ Auth-Results header / DNS key   │
+│ DMARC Policy           │ Domain authentication policy enforcement │ Auth-Results header / _dmarc.   │
+│ IP Reputation          │ Abuse confidence scoring (0-100)         │ AbuseIPDB API                   │
+│ URL Blocklist          │ Google's global phishing/malware list    │ Safe Browsing API               │
+│ URL Malware Scan       │ Multi-engine scan (60+ AV engines)       │ VirusTotal API v3               │
+│ IP Geolocation         │ Map relay hops → country/ISP/ASN         │ ip-api.com (free, no key)       │
+│ Domain Age             │ Flag newly registered domains            │ WHOIS (python-whois)            │
+│ Lookalike Detection    │ DNS-verified brand impersonation         │ Levenshtein + MX/A DNS probes   │
+│ URL Analysis           │ Shortened/IP-based/suspicious links      │ Pattern engine (offline)        │
+│ Link Mismatch          │ Visible text ≠ actual href               │ HTML parser (offline)           │
+│ Urgency Keywords       │ Social engineering pressure detection    │ Regex engine (offline)          │
+└────────────────────────┴──────────────────────────────────────────┴─────────────────────────────────┘
+```
 
-### Installation
+---
+
+## `> ./install.sh`
 
 ```bash
+# Clone the repo
+git clone https://github.com/yourusername/phishguard.git
 cd phishguard
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Create your .env file from the template
+# Set up your environment
 cp .env.example .env
-# Edit .env and paste your API keys (optional — see below)
+nano .env   # paste your API keys (all optional)
 ```
 
-### Environment Variables (`.env`)
+### Environment Variables
 
-Copy `.env.example` → `.env` and fill in your keys. **Every key is optional** — if left blank, that specific check runs in offline mode while everything else still works.
+Every key is **optional**. Missing key = that check runs in offline mode. Everything else still works.
 
 ```ini
+# ──────────────────────────────────────────────────────────
+#  PHISHGUARD ENV CONFIG
+# ──────────────────────────────────────────────────────────
+
 # AbuseIPDB — IP reputation scoring
-# Free: 1,000 checks/day  |  https://www.abuseipdb.com/account/api
-ABUSEIPDB_API_KEY=your_key_here
+# Tier: FREE (1,000 req/day)
+# Docs: https://www.abuseipdb.com/account/api
+ABUSEIPDB_API_KEY=
 
-# Google Safe Browsing — URL blocklist lookup
-# Free: 10,000 queries/day  |  https://console.cloud.google.com/apis/library/safebrowsing.googleapis.com
-SAFE_BROWSING_API_KEY=your_key_here
+# Google Safe Browsing — URL blocklist
+# Tier: FREE (10,000 req/day)
+# Docs: https://console.cloud.google.com/apis/library/safebrowsing.googleapis.com
+SAFE_BROWSING_API_KEY=
 
-# VirusTotal — URL / domain malware scanning
-# Free: 4 lookups/min, 500/day  |  https://www.virustotal.com/gui/my-apikey
-VIRUSTOTAL_API_KEY=your_key_here
+# VirusTotal — Multi-engine URL/domain scanning
+# Tier: FREE (4 req/min, 500/day)
+# Docs: https://www.virustotal.com/gui/my-apikey
+VIRUSTOTAL_API_KEY=
 
-# NOTE: IP Geolocation uses ip-api.com (free, no API key needed).
+# ip-api.com  → NO KEY NEEDED (free, 45 req/min)
+# WHOIS       → NO KEY NEEDED (python-whois, unlimited)
+# DNS lookups → NO KEY NEEDED (SPF/DKIM/DMARC/MX/A)
 ```
 
-The dashboard header shows exactly which APIs are live vs offline.
+---
 
-### Launch Dashboard
+## `> streamlit run dashboard.py`
 
 ```bash
+# Launch the web interface
 streamlit run dashboard.py
 
-# Or use the launcher
+# Or use the CLI launcher
 python run.py dashboard
-```
-
-The dashboard will be available at `http://localhost:8501`
-
-> **Note:** The dashboard uses a **dark-only cybersecurity theme** (green-on-black). Configured in `.streamlit/config.toml`.
-
-### CLI Analysis
-
-```bash
 python run.py analyze path/to/email.eml
 python run.py test
 ```
 
-## 📊 Threat Scoring
+Dashboard runs at `http://localhost:8501` — dark theme, green-on-black, no light mode. This is a security tool, not a blog.
 
-PhishGuard calculates a composite threat score (0-100):
+---
 
-| Score | Classification | Action |
-|-------|---------------|--------|
-| 0-30 | LOW_RISK | Likely legitimate |
-| 31-70 | MEDIUM_RISK | Review required |
-| 71-100 | HIGH_RISK_PHISHING | Likely phishing — Block |
+## `> cat /proc/scoring_engine`
 
-### Scoring Factors
+### Threat Classification
 
-| Factor | Points | Source |
-|--------|--------|--------|
-| SPF Fail | +30 | Authentication-Results / DNS |
-| SPF Softfail | +15 | Authentication-Results / DNS |
-| DKIM Fail | +20 | Authentication-Results |
-| DMARC Fail | +25 | Authentication-Results / DNS |
-| Lookalike Domain (confirmed) | +40 | Levenshtein + DNS MX check |
-| Potential Lookalike | +10 | Similar to brand but has valid MX |
-| Sender Mismatch | +15 | Header vs envelope comparison |
-| New Domain (<30 days) | +25 | WHOIS lookup |
-| Suspicious TLD | +15 | `.tk`, `.ml`, `.xyz`, `.ru`, etc. |
-| Malicious URLs (Safe Browsing / VirusTotal) | +25 each | **Safe Browsing** or **VirusTotal API** |
-| Link Mismatches | +15 each | HTML href analysis (max +30) |
-| Suspicious URLs | +10 each | Pattern analysis (max +20) |
-| Urgency Keywords | +5 each | Regex matching (max +20) |
-| IP Reputation | Up to +50 | **AbuseIPDB API** |
-| Trusted Sender | ×0.5 discount | If sender is a known brand |
+| Score | Level | Verdict |
+|:-----:|:-----:|:--------|
+| `0-30` | 🟢 `LOW_RISK` | Probably clean. Pass it through. |
+| `31-70` | 🟠 `MEDIUM_RISK` | Suspicious. Needs human eyes. |
+| `71-100` | 🔴 `HIGH_RISK_PHISHING` | Kill it. Block the sender. |
 
-### How Authentication Works
-
-When you upload a `.eml` file or paste headers, PhishGuard **cannot** re-run SPF from scratch (the original SMTP session is needed). Instead it:
-
-1. **Parses the `Authentication-Results` header** that the receiving MTA (Gmail, Outlook, etc.) already wrote — this is the industry-standard approach used by every SOC tool.
-2. If no `Authentication-Results` header exists, falls back to **DNS lookups** for SPF record presence, DKIM selector existence, and DMARC policy.
-
-### DNS-Verified Lookalike Detection
-
-Multi-step approach to minimise false positives:
-
-1. **Exact match** → Domain is a known brand → ✅ Legitimate
-2. **Subdomain check** → e.g. `alerts.sbi.co.in` → ✅ Legitimate
-3. **Same org, different TLD** + valid MX → ✅ Legitimate
-4. **Levenshtein (1-3 edits)** + DNS verification → Smart detection
-5. **Brand name embedded** → e.g. `paypal-login.com` → Detected
-6. **Suspicious TLD** → `.tk`, `.xyz`, `.ru` → Flagged
-
-### Supported Brands (106+)
-
-Global tech, US banks, **Indian banks** (SBI, HDFC, ICICI, Axis, Kotak, PNB, etc.), **Indian services** (Paytm, PhonePe, Razorpay, Flipkart, Jio, etc.), international banks, and e-commerce.
-
-## 🏗️ Architecture
+### Scoring Breakdown
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        INPUT LAYER                          │
-│       (IMAP, Gmail API, .eml Upload, Pasted Headers)        │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-┌───────────────────────────▼─────────────────────────────────┐
-│                      PARSER LAYER                           │
-│     (Header Extraction, MIME Decoding, Body Parse,          │
-│      Smart Header Unfold for pasted input)                  │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-┌───────────────────────────▼─────────────────────────────────┐
-│                     ANALYSIS LAYER                          │
-│  ┌──────────────────┐ ┌──────────────────┐ ┌─────────────┐  │
-│  │ Auth Validator   │ │ Relay Path       │ │ Threat      │  │
-│  │ (Auth-Results    │ │ Analyzer         │ │ Intelligence│  │
-│  │  header + DNS)   │ │ (ip-api.com Geo) │ │ Broker      │  │
-│  └──────────────────┘ └──────────────────┘ └─────────────┘  │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │ AbuseIPDB  │ Safe Browsing │ VirusTotal │ WHOIS     │    │
-│  │ (IP rep)   │ (URL block)   │ (URL scan) │ (age)     │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │   Phishing Heuristics Engine (DNS-verified)         │    │
-│  │   • Lookalike detection • Urgency keywords          │    │
-│  │   • Link mismatches    • Suspicious URLs            │    │
-│  └─────────────────────────────────────────────────────┘    │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-┌───────────────────────────▼─────────────────────────────────┐
-│                   PRESENTATION LAYER                        │
-│        (Streamlit Dashboard / CLI — Dark Theme)             │
-└─────────────────────────────────────────────────────────────┘
+FACTOR                                    POINTS     SOURCE
+──────────────────────────────────────────────────────────────
+SPF Fail                                  +30        Auth-Results / DNS
+SPF Softfail                              +15        Auth-Results / DNS
+DKIM Fail                                 +20        Auth-Results
+DMARC Fail                                +25        Auth-Results / DNS
+Lookalike Domain (confirmed)              +40        Levenshtein + DNS MX
+Potential Lookalike                        +10        Similar brand, valid MX
+Sender Mismatch (header ≠ envelope)       +15        Header comparison
+New Domain (<30 days)                     +25        WHOIS
+Suspicious TLD (.tk .ml .xyz .ru)         +15        TLD list
+Malicious URL (Safe Browsing/VT)          +25 each   API (max +50)
+Link Mismatch (text ≠ href)              +15 each   HTML parse (max +30)
+Suspicious URL patterns                   +10 each   Heuristics (max +20)
+Urgency Keywords                          +5 each    Regex (max +20)
+IP Reputation (AbuseIPDB)                 up to +50  API
+──────────────────────────────────────────────────────────────
+Trusted Sender Discount                   ×0.5       If domain is a known brand
 ```
 
-## 📁 Project Structure
+---
+
+## `> tcpdump -i auth0 -vv`
+
+### How Authentication Actually Works
+
+When you upload a `.eml`, PhishGuard **can't** replay the original SMTP session. That's gone. Instead:
+
+1. **Parse `Authentication-Results` header** — written by the receiving MTA (Gmail, O365, etc.) during the live transaction. This is what every real SOC tool does.
+2. **DNS Fallback** — if no Auth-Results header exists, we probe:
+   - `TXT` records for SPF policy
+   - DKIM selector DNS keys
+   - `_dmarc.domain.tld` for DMARC policy
+
+### Lookalike Detection Pipeline
+
+```
+INPUT: sender domain
+   │
+   ├─ [1] Exact match against 106+ brands     → ✅ LEGIT
+   ├─ [2] Subdomain of known brand             → ✅ LEGIT  (alerts.sbi.co.in)
+   ├─ [3] Same org, different TLD + valid MX   → ✅ LEGIT
+   ├─ [4] Levenshtein dist 1-3 + DNS verify    → 🔴 PHISH  (paypa1.com → paypal.com)
+   ├─ [5] Brand name embedded in domain        → 🔴 PHISH  (paypal-login.com)
+   └─ [6] Suspicious TLD                       → 🟠 FLAG   (.tk, .xyz, .ru)
+```
+
+**106+ monitored brands:** Global tech, US banks, Indian banks (SBI, HDFC, ICICI, Axis, Kotak, PNB…), Indian services (Paytm, PhonePe, Razorpay, Flipkart, Jio…), international banks, e-commerce.
+
+---
+
+## `> tree /opt/phishguard`
 
 ```
 phishguard/
-├── .env.example                  # API key template — copy to .env
-├── .gitignore                    # Protects .env from commits
+├── .env.example                    # API key template
+├── .gitignore                      # protects .env, cache, __pycache__
 ├── .streamlit/
-│   └── config.toml               # Forced dark theme config
+│   └── config.toml                 # forced dark theme
+├── config.py                       # dotenv loader, brands, scoring weights
+├── dashboard.py                    # Streamlit UI (dark cyber theme)
+├── run.py                          # CLI entry point
+├── requirements.txt                # deps
 ├── modules/
 │   ├── __init__.py
-│   ├── email_fetcher.py          # IMAP/email parsing
-│   ├── authentication_validator.py # Auth-Results parsing + DNS fallback
-│   ├── relay_path_analyzer.py    # Received header analysis + ip-api.com GeoIP
-│   ├── threat_intelligence.py    # AbuseIPDB + Safe Browsing + VirusTotal + WHOIS
-│   ├── phishing_heuristics.py    # DNS-verified phishing detection
-│   └── analyzer_engine.py        # Main orchestration
+│   ├── email_fetcher.py            # IMAP / .eml parser
+│   ├── authentication_validator.py # Auth-Results parse + DNS fallback
+│   ├── relay_path_analyzer.py      # Received headers + ip-api.com GeoIP
+│   ├── threat_intelligence.py      # AbuseIPDB + Safe Browsing + VirusTotal + WHOIS
+│   ├── phishing_heuristics.py      # DNS-verified lookalike + heuristics engine
+│   └── analyzer_engine.py          # orchestrator — wires everything together
 ├── test_data/
-│   ├── sample_phishing.eml
-│   └── sample_legitimate.eml
-├── cache/
-│   └── threat_cache.json         # Auto-generated API response cache (24h TTL)
-├── config.py                     # Loads .env, brand lists, scoring weights
-├── dashboard.py                  # Streamlit UI (dark theme)
-├── run.py                        # CLI entry point
-└── requirements.txt              # Dependencies
+│   ├── sample_phishing.eml         # known-bad sample for testing
+│   └── sample_legitimate.eml       # known-good sample
+└── cache/
+    └── threat_cache.json           # auto-generated, 24h TTL
 ```
 
-## 🔑 API Keys Summary
+---
 
-| Service | What It Does | Free Tier | Key Required? |
-|---------|-------------|-----------|---------------|
-| **AbuseIPDB** | IP abuse/spam reputation | 1,000 checks/day | Optional |
-| **Google Safe Browsing** | URL malware/phishing blocklist | 10,000 queries/day | Optional |
-| **ipapi.co** | IP → Country/City/ISP geolocation | 1,000 requests/day | No (free keyless tier) |
-| **WHOIS** | Domain registration age | Unlimited | No (uses python-whois) |
-| **DNS (MX/A/TXT)** | SPF, DKIM, DMARC, lookalike verification | Unlimited | No |
+## `> nmap -sV --script=api-scan localhost`
 
-**All APIs are optional.** Without any keys, PhishGuard still provides:
-- Authentication-Results header parsing (SPF/DKIM/DMARC)
-- DNS-verified lookalike domain detection
-- Link mismatch analysis
-- Urgency keyword detection
-- Suspicious URL pattern analysis
-- WHOIS domain age lookups
-- IP geolocation (ipapi.co free tier)
+| Service | Purpose | Free Tier | Key? |
+|---------|---------|-----------|:----:|
+| **AbuseIPDB** | IP abuse/spam reputation | 1,000/day | Optional |
+| **Google Safe Browsing** | URL phishing/malware blocklist | 10,000/day | Optional |
+| **VirusTotal** | Multi-engine URL scanning | 500/day | Optional |
+| **ip-api.com** | IP → geo/ISP/ASN mapping | 45/min | ❌ No key |
+| **WHOIS** | Domain registration age | Unlimited | ❌ No key |
+| **DNS (MX/A/TXT)** | SPF, DKIM, DMARC, lookalike verify | Unlimited | ❌ No key |
 
-## 🧪 Testing
+**Zero API keys?** PhishGuard still gives you:
+- ✅ Authentication-Results header parsing (SPF/DKIM/DMARC)
+- ✅ DNS-verified lookalike domain detection (106+ brands)
+- ✅ Link mismatch analysis
+- ✅ Urgency keyword detection
+- ✅ Suspicious URL pattern analysis
+- ✅ WHOIS domain age lookups
+- ✅ IP geolocation (ip-api.com free tier)
+- ✅ Full relay path tracing
+
+---
+
+## `> arch`
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                          INPUT LAYER                             │
+│         IMAP  ·  Gmail API  ·  .eml Upload  ·  Paste Headers    │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+┌──────────────────────────────▼───────────────────────────────────┐
+│                         PARSER LAYER                             │
+│    Header Extraction  ·  MIME Decode  ·  Body Parse  ·  Unfold   │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+┌──────────────────────────────▼───────────────────────────────────┐
+│                        ANALYSIS LAYER                            │
+│                                                                  │
+│  ┌─────────────────┐ ┌─────────────────┐ ┌────────────────────┐  │
+│  │ AUTH VALIDATOR   │ │ RELAY ANALYZER  │ │ THREAT INTEL       │  │
+│  │ Auth-Results +   │ │ ip-api.com geo  │ │ AbuseIPDB          │  │
+│  │ DNS fallback     │ │ hop tracing     │ │ Safe Browsing      │  │
+│  │ (SPF/DKIM/DMARC) │ │ anomaly detect  │ │ VirusTotal         │  │
+│  └─────────────────┘ └─────────────────┘ │ WHOIS              │  │
+│                                          └────────────────────┘  │
+│  ┌───────────────────────────────────────────────────────────┐   │
+│  │              PHISHING HEURISTICS ENGINE                   │   │
+│  │  Lookalike (Levenshtein + DNS)  ·  Urgency keywords       │   │
+│  │  Link mismatches  ·  Suspicious URLs  ·  Brand DB (106+)  │   │
+│  └───────────────────────────────────────────────────────────┘   │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+┌──────────────────────────────▼───────────────────────────────────┐
+│                      PRESENTATION LAYER                          │
+│              Streamlit Dashboard  ·  CLI  ·  JSON Export         │
+│                   [ dark theme · green-on-black ]                │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## `> pytest --tb=short`
 
 ```bash
 python run.py test
@@ -233,32 +277,39 @@ python run.py analyze test_data/sample_phishing.eml
 python run.py analyze test_data/sample_legitimate.eml
 ```
 
-## 🛡️ Security Considerations
+---
 
-- API keys are loaded from `.env` file — never commit this file
-- `.gitignore` is configured to exclude `.env` and cache files
-- Email content is processed locally — no data leaves your system (except API calls you opt into)
-- DNS lookups are used only for domain verification (MX/A/TXT records)
-- API response cache (24h TTL) reduces external API calls
+## `> cat /etc/security/policy.conf`
 
-## 🔮 Future Enhancements
-
-- [ ] YARA rules for attachment scanning
-- [ ] Machine learning classification
-- [ ] Database storage (PostgreSQL)
-- [ ] REST API
-- [ ] Slack/Teams integration
-- [ ] SIEM integration (Splunk, ELK)
-- [ ] Full ARC (Authenticated Received Chain) validation
-
-## 📄 License
-
-MIT License — See LICENSE file for details.
-
-## 🤝 Contributing
-
-Contributions welcome! Please submit pull requests or open issues.
+- API keys loaded from `.env` — **never committed** (`.gitignore` enforced)
+- Email content processed **locally** — nothing leaves your box except the API calls you opt into
+- DNS lookups are read-only (MX/A/TXT records for verification only)
+- API response cache (24h TTL) minimizes external calls
+- No telemetry. No tracking. No cloud dependency.
 
 ---
 
-**Built with Python, Streamlit, and ❤️ for email security.**
+## `> cat TODO.md`
+
+- [ ] YARA rules for attachment scanning
+- [ ] ML-based classification model
+- [ ] PostgreSQL storage backend
+- [ ] REST API for integration
+- [ ] Slack / Teams alerting
+- [ ] SIEM connectors (Splunk, ELK, Sentinel)
+- [ ] ARC (Authenticated Received Chain) validation
+- [ ] Bulk `.eml` batch processing
+
+---
+
+## `> cat LICENSE`
+
+MIT — do whatever you want. Just don't use it for evil.
+
+---
+
+## `> git log --oneline -1`
+
+**Built with Python, Streamlit, and paranoia.**
+
+*If it looks like a phish and smells like a phish — PhishGuard will catch it.*
