@@ -144,37 +144,9 @@ st.markdown("""
     .stError p, .stError span { color: #f88 !important; }
 
     /* ══════════════════════════════════════════════════════════
-       DATAFRAME / TABLE — force dark
+       DATAFRAME / TABLE — default styling
        ══════════════════════════════════════════════════════════ */
     .stDataFrame { border-radius: 12px; overflow: hidden; }
-
-    /* Glide data grid (Streamlit's default table renderer) */
-    [data-testid="stDataFrame"] canvas + div,
-    [data-testid="stDataFrame"] [role="grid"],
-    [data-testid="stDataFrame"],
-    .dvn-scroller,
-    .glideDataEditor {
-        background-color: #0d1117 !important;
-    }
-
-    /* Fallback: if rendered as HTML table */
-    .stDataFrame table,
-    .stDataFrame thead,
-    .stDataFrame tbody,
-    .stDataFrame th,
-    .stDataFrame td {
-        background-color: #0d1117 !important;
-        color: #c9d1d9 !important;
-        border-color: #1b2b1b !important;
-    }
-    .stDataFrame th {
-        background-color: #111b11 !important;
-        color: #58a558 !important;
-        font-weight: 600;
-    }
-    .stDataFrame tr:hover td {
-        background-color: #0f1f0f !important;
-    }
 
     /* ══════════════════════════════════════════════════════════
        CODE BLOCKS (st.code)
